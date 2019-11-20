@@ -7,7 +7,8 @@ import (
 
 func LoadRouterHandler()  {
 	router := gin.Default()
-
+	router.Static("/static", "./static")
+	//router.LoadHTMLGlob("static/view/*")
 	//router.Use(middleware.LimitIP())
 	//router.GET("/login", func(c *gin.Context) {
 	//	c.JSON(200,"login page")
@@ -18,14 +19,19 @@ func LoadRouterHandler()  {
 		c.JSON(200,"index page")
 	})
 
-	fileGroup := router.Group("/article")
+	fileGroup := router.Group("/file")
 	{
-		fileGroup.GET("/total", handler.UploadHandler)
-		fileGroup.POST("/paged", controller.GetArticlePaged())
-		fileGroup.POST("/articles", controller.GetArticlesByPersonID())
-		fileGroup.POST("/find", controller.FindArticleByTitle())
-		fileGroup.POST("/new", controller.CreateNewArticle())
+		fileGroup.GET("/upload", handler.UploadHandler)
+		fileGroup.POST("/upload", handler.UploadHandler)
 
+		// 秒传接口
+		//fileGroup.POST("/fastupload", api.TryFastUploadHandler)
+		//
+		//// 分块上传接口
+		//fileGroup.POST("/mpupload/init", api.InitialMultipartUploadHandler)
+		//fileGroup.POST("/mpupload/uppart", api.UploadPartHandler)
+		//fileGroup.POST("/mpupload/complete", api.CompleteUploadHandler)
+		//
 	}
 	//userGroup := router.Group("/user")
 	//{

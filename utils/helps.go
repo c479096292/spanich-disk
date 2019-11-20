@@ -1,17 +1,22 @@
 package utils
 
-// FileMeta : 文件元信息结构
-type FileMeta struct {
-	FileSha1 string
-	FileName string
-	FileSize int64
-	Location string
-	UploadAt string
+import (
+	"crypto/md5"
+	"crypto/sha1"
+	"encoding/hex"
+	"io"
+	"os"
+)
+
+func FileSha1(file *os.File) string {
+	_sha1 := sha1.New()
+	io.Copy(_sha1, file)
+	return hex.EncodeToString(_sha1.Sum(nil))
 }
 
-var fileMetas map[string]FileMeta
-
-func init() {
-	fileMetas = make(map[string]FileMeta)
+// 密码加密
+func EncodeMD5(val string) string {
+	m :=md5.New()
+	m.Write([]byte(val))
+	return hex.EncodeToString(m.Sum(nil)) // 将加密后的byte转为string
 }
-
