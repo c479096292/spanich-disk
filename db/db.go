@@ -22,13 +22,20 @@ func init()  {
 	}
 }
 
-
 func NewDB() *sql.DB {
 	return db
 }
 
+// ExecResult: sql函数执行的结果
+type ExecResult struct {
+	Suc  bool        `json:"suc"`
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+}
+
 func ParseRows(rows *sql.Rows) []map[string]interface{} {
-	columns, _ := rows.Columns()
+	columns, _ := rows.Columns() // 返回全部列名
 	scanArgs := make([]interface{}, len(columns))
 	values := make([]interface{}, len(columns))
 	for j := range values {
@@ -37,7 +44,7 @@ func ParseRows(rows *sql.Rows) []map[string]interface{} {
 
 	record := make(map[string]interface{})
 	records := make([]map[string]interface{}, 0)
-	for rows.Next() {
+	for rows.Next() { // 下一行数据存在则继续循环
 		//将行数据保存到record字典
 		err := rows.Scan(scanArgs...)
 		checkErr(err)

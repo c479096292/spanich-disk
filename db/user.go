@@ -1,8 +1,7 @@
 package db
 
 import (
-	"fmt"
-	"github.com/c479096292/spinach-disk/utils"
+	"log"
 )
 
 // User : 用户表model
@@ -16,88 +15,140 @@ type User struct {
 }
 
 // UserSignup : 通过用户名及密码完成user表的注册操作
-func UserSignup(username string, passwd string) bool {
+func UserSignup(username string, passwd string) (res ExecResult) {
 	stmt, err := db.Prepare("insert ignore into tbl_user (`user_name`,`user_pwd`) values (?,?)")
 	if err != nil {
-		fmt.Println("Failed to insert, err:" + err.Error())
-		return false
+		log.Println("Failed to insert, err:" + err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
 	defer stmt.Close()
 
-	MD5Pwd := utils.EncodeMD5(passwd)
-	ret, err := stmt.Exec(username, MD5Pwd)
+	ret, err := stmt.Exec(username, passwd)
 	if err != nil {
-		fmt.Println("Failed to insert, err:" + err.Error())
-		return false
+		log.Println("Failed to insert, err:" + err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
-	if rowsAffect, err := ret.RowsAffected(); err == nil {
-		if rowsAffect > 0 {
-			return true
-		}
+	if rowsAffected, err := ret.RowsAffected(); nil == err && rowsAffected > 0 {
+		res.Suc = true
+		return
 	}
-	return false
+
+	res.Suc = false
+	res.Msg = "无记录更新"
+	return
 }
 
 // UserSignin : 判断密码是否一致
-func UserSignin(username string, encpwd string) bool {
+func UserSignin(username string, encpwd string) (res ExecResult) {
 	stmt, err := db.Prepare("select * from tbl_user where user_name=? limit 1")
 	if err != nil {
-		fmt.Println(err.Error())
-		return false
+		log.Println(err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
 	defer stmt.Close()
 
-	MD5Pwd := utils.EncodeMD5(encpwd)
 	rows, err := stmt.Query(username)
 	if err != nil {
-		fmt.Println(err.Error())
-		return false
+		log.Println(err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	} else if rows == nil {
-		fmt.Println("username not found: " + username)
-		return false
+		log.Println("username not found: " + username)
+		res.Suc = false
+		res.Msg = "用户名未注册"
+		return
 	}
 
 	pRows := ParseRows(rows)
-	if len(pRows) > 0 && string(pRows[0]["user_pwd"].([]byte)) == MD5Pwd {
-		return true
+	if len(pRows) > 0 && string(pRows[0]["user_pwd"].([]byte)) == encpwd {
+		res.Suc = true
+		res.Data = true
+		return
 	}
-	return false
+	res.Suc = false
+	res.Msg = "用户名/密码不匹配"
+	return
 }
 
 // UpdateToken : 刷新用户登录的token
-func UpdateToken(username string, token string) bool {
+func UpdateToken(username string, token string) (res ExecResult) {
 	stmt, err := db.Prepare(
 		"replace into tbl_user_token (`user_name`,`user_token`) values (?,?)")
 	if err != nil {
-		fmt.Println(err.Error())
-		return false
+		log.Println(err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(username, token)
 	if err != nil {
-		fmt.Println(err.Error())
-		return false
+		log.Println(err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
-	return true
+	res.Suc = true
+	return
 }
 
 // GetUserInfo : 查询用户信息
-func GetUserInfo(username string) (User, error) {
+func GetUserInfo(username string) (res ExecResult) {
 	user := User{}
 
 	stmt, err := db.Prepare(
 		"select user_name,signup_at from tbl_user where user_name=? limit 1")
 	if err != nil {
-		fmt.Println(err.Error())
-		return user, err
+		log.Println(err.Error())
+		// error不为nil, 返回时user应当置为nil
+		//return user, err
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
 	defer stmt.Close()
 
 	// 执行查询的操作
 	err = stmt.QueryRow(username).Scan(&user.Username, &user.SignupAt)
 	if err != nil {
-		return user, err
+		res.Suc = false
+		res.Msg = err.Error()
+		return
 	}
-	return user, nil
+	res.Suc = true
+	res.Data = user
+	return
+}
+
+// UserExist : 查询用户是否存在
+func UserExist(username string) (res ExecResult) {
+	stmt, err := db.Prepare(
+		"select 1 from tbl_user where user_name=? limit 1")
+	if err != nil {
+		log.Println(err.Error())
+		res.Suc = false
+		res.Msg = err.Error()
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(username)
+	if err != nil {
+		res.Suc = false
+		res.Msg = err.Error()
+		return
+	}
+	res.Suc = true
+	res.Data = map[string]bool{
+		"exists": rows.Next(),
+	}
+	return
 }
