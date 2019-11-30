@@ -3,7 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/c479096292/spinach-disk/common"
-	"github.com/c479096292/spinach-disk/db"
+	"github.com/c479096292/spinach-disk/service/dbproxy/client"
 	"time"
 	cfg "github.com/c479096292/spinach-disk/config"
 	proto "github.com/c479096292/spinach-disk/service/account/proto"
@@ -39,7 +39,7 @@ func (u *User) Signup(ctx context.Context, req *proto.ReqSignup, res *proto.Resp
 	// TODO
 	encPasswd := utils.Sha1([]byte(passwd + cfg.PasswordSalt))
 	// 将用户信息注册到用户表中
-	dbResp, err := db.UserSignup(username, encPasswd)
+	dbResp, err := client.UserSignup(username, encPasswd)
 	if err == nil && dbResp.Suc {
 		res.Code = common.StatusOK
 		res.Message = "注册成功"
@@ -55,10 +55,10 @@ func (u *User) Signin(ctx context.Context, req *proto.ReqSignin, res *proto.Resp
 	username := req.Username
 	password := req.Password
 
-	encPasswd := utils.Sha1([]byte(password + config.PasswordSalt))
+	encPasswd := utils.Sha1([]byte(password + cfg.PasswordSalt))
 
 	// 1. 校验用户名及密码
-	dbResp, err := dbcli.UserSignin(username, encPasswd)
+	dbResp, err := client.UserSignin(username, encPasswd)
 	if err != nil || !dbResp.Suc {
 		res.Code = common.StatusLoginFailed
 		return nil
@@ -66,7 +66,7 @@ func (u *User) Signin(ctx context.Context, req *proto.ReqSignin, res *proto.Resp
 
 	// 2. 生成访问凭证(token)
 	token := GenToken(username)
-	upRes, err := dbcli.UpdateToken(username, token)
+	upRes, err := client.UpdateToken(username, token)
 	if err != nil || !upRes.Suc {
 		res.Code = common.StatusServerError
 		return nil
@@ -81,7 +81,7 @@ func (u *User) Signin(ctx context.Context, req *proto.ReqSignin, res *proto.Resp
 // UserInfo ： 查询用户信息
 func (u *User) UserInfo(ctx context.Context, req *proto.ReqUserInfo, res *proto.RespUserInfo) error {
 	// 查询用户信息
-	dbResp, err := dbcli.GetUserInfo(req.Username)
+	dbResp, err := client.GetUserInfo(req.Username)
 	if err != nil {
 		res.Code = common.StatusServerError
 		res.Message = "服务错误"
@@ -94,7 +94,7 @@ func (u *User) UserInfo(ctx context.Context, req *proto.ReqUserInfo, res *proto.
 		return nil
 	}
 
-	user := dbcli.ToTableUser(dbResp.Data)
+	user := client.ToTableUser(dbResp.Data)
 
 	// 3. 组装并且响应用户数据
 	res.Code = common.StatusOK
