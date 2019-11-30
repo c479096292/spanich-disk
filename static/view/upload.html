@@ -56,13 +56,14 @@
   // });
 
   function onUpload() {
-    var upUrl = "/file/upload?" + queryParams();
-    var upEntry = localStorage.getItem("uploadEntry");
+    var upUrl = ":28080/file/upload?" + queryParams();
+    // var upEntry = localStorage.getItem("uploadEntry");
+    var upEntry = "127.0.0.1";
     if (upEntry != "" ) {
       if (upEntry.indexOf("http:")>=0) {
-        upUrl = upEntry + "/file/upload?" + queryParams();
+        upUrl = upEntry + ":28080/file/upload?" + queryParams();
       } else {
-        upUrl = "http://" + upEntry + "/file/upload?" + queryParams();
+        upUrl = "http://" + upEntry + ":28080/file/upload?" + queryParams();
       }
     }
     $.ajax({
