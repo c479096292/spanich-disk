@@ -5,21 +5,29 @@ import (
 	"github.com/c479096292/spinach-disk/common"
 	"github.com/c479096292/spinach-disk/config"
 	"github.com/c479096292/spinach-disk/mq"
-	"github.com/micro/go-micro"
 	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
-	upRpc "github.com/c479096292/spinach-disk/service/upload/handler"
 	cfg "github.com/c479096292/spinach-disk/service/upload/config"
+	upRpc "github.com/c479096292/spinach-disk/service/upload/handler"
 	upProto "github.com/c479096292/spinach-disk/service/upload/proto"
 	"github.com/c479096292/spinach-disk/service/upload/route"
 	"github.com/micro/cli"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-plugins/registry/consul"
 	"log"
 	"os"
 	"time"
 )
 
 func startRPCService() {
+	reg := consul.NewRegistry(func(op *registry.Options){
+		op.Addrs = []string{
+			"127.0.0.1:8500",
+		}
+	})
 	service := micro.NewService(
 		micro.Name("go.micro.service.upload"),
+		micro.Registry(reg),
 		micro.RegisterTTL(time.Second*10),
 		micro.RegisterInterval(time.Second*5),
 		micro.Flags(common.CustomFlags...),
