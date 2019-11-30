@@ -1,9 +1,11 @@
-package download
+package main
 
 import (
 	"fmt"
 	"github.com/c479096292/spinach-disk/common"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-plugins/registry/consul"
 	"time"
 	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
 	dlProto "github.com/c479096292/spinach-disk/service/download/proto"
@@ -13,8 +15,14 @@ import (
 )
 
 func startRPCService() {
+	reg := consul.NewRegistry(func(op *registry.Options){
+		op.Addrs = []string{
+			"127.0.0.1:8500",
+		}
+	})
 	service := micro.NewService(
-		micro.Name("go.micro.service.download"), // 在注册中心中的服务名称
+		micro.Name("go.micro.service.download"),
+		micro.Registry(reg),
 		micro.RegisterTTL(time.Second*10),
 		micro.RegisterInterval(time.Second*5),
 		micro.Flags(common.CustomFlags...),
