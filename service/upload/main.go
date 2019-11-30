@@ -1,4 +1,4 @@
-package upload
+package main
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func startRPCService() {
 			mqhost := c.String("mqhost")
 			if len(mqhost) > 0 {
 				log.Println("custom mq address: " + mqhost)
-				mq.UpdateRabbitHost(mqhost)
+				//mq.UpdateRabbitHost(mqhost)
 			}
 		}),
 	)
@@ -65,9 +65,12 @@ func startAPIService() {
 }
 
 func main() {
-	os.MkdirAll(config.TempLocalRootDir, 0777)
+	err := os.MkdirAll(config.TempLocalRootDir, 0777)
+	if err !=nil {
+		fmt.Println("upload service MkdirAll err:",err)
+	}
 	os.MkdirAll(config.TempPartRootDir, 0777)
-
+// ttp://upload.fileserver.com/file/upload?username=admin&token=593adcd01533865a12eed9b730301e335dde8c09
 	// api 服务
 	go startAPIService()
 

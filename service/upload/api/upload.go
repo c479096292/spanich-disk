@@ -2,11 +2,15 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/c479096292/spinach-disk/common"
+	cfg "github.com/c479096292/spinach-disk/config"
 	"github.com/c479096292/spinach-disk/mq"
+	"github.com/c479096292/spinach-disk/service/dbproxy/client"
 	"github.com/c479096292/spinach-disk/service/dbproxy/model"
 	"github.com/c479096292/spinach-disk/store/ceph"
 	"github.com/c479096292/spinach-disk/store/oss"
+	"github.com/c479096292/spinach-disk/utils"
 	"github.com/gin-gonic/gin"
 	"io"
 	"io/ioutil"
@@ -14,18 +18,14 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"encoding/json"
-	cfg "github.com/c479096292/spinach-disk/config"
-	"github.com/c479096292/spinach-disk/utils"
-	"github.com/c479096292/spinach-disk/service/dbproxy/client"
 )
 
 // DoUploadHandler ： 处理文件上传
 func DoUploadHandler(c *gin.Context) {
 	errCode := 0
 	defer func() {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		//c.Header("Access-Control-Allow-Origin", "*")
+		//c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 		if errCode < 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"code": errCode,
