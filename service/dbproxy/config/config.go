@@ -7,5 +7,5 @@ var (
 )
 
 func UpdateDBHost(host string) {
-	MySQLSource = fmt.Sprintf("root:251700@tcp(%s:3306)/fileserver?charset=utf8mb4", host)
+	MySQLSource = fmt.Sprintf("root:251700@tcp(%s)/fileserver?charset=utf8mb4", host)
 }
