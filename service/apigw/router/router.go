@@ -43,7 +43,6 @@ func BinaryFileSystem(root string) *binaryFileSystem {
 func Router() *gin.Engine {
 	router := gin.Default()
 
-	//	router.Static("/static/", "./static")
 	// 将静态文件打包到bin文件
 	//router.Use(static.Serve("/static/", BinaryFileSystem("static")))
 	router.Static("/static/", "./static")
@@ -63,6 +62,7 @@ func Router() *gin.Engine {
 	router.POST("/file/query", handler.FileQueryHandler)
 	// 用户文件修改(重命名)
 	router.POST("/file/update", handler.FileMetaUpdateHandler)
+	// TODO 删除
 
 	return router
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/c479096292/spinach-disk/config"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-plugins/registry/consul"
 	"log"
 	"net/http"
 	"context"
@@ -25,8 +27,14 @@ var (
 func init() {
 	//配置请求容量及qps
 	bRate := ratelimit2.NewBucketWithRate(100, 1000)
+	reg := consul.NewRegistry(func(op *registry.Options){
+		op.Addrs = []string{
+			"127.0.0.1:8500",
+		}
+	})
 	service := micro.NewService(
 		micro.Flags(common.CustomFlags...),
+		micro.Registry(reg),
 		micro.WrapClient(ratelimit.NewClientWrapper(bRate, false)), //加入限流功能, false为不等待(超限即返回请求失败)
 		micro.WrapClient(hystrix.NewClientWrapper()),               // 加入熔断功能, 处理rpc调用失败的情况(cirucuit breaker)
 	)
