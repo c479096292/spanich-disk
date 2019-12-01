@@ -1,6 +1,7 @@
-FROM centos:7
+FROM alpine:3.2
 
-ADD bin/apigw /
+COPY bin/apigw /
+COPY ./static/ /static/
 
 RUN chmod 777 /apigw
 

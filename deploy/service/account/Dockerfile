@@ -1,9 +1,11 @@
-FROM centos:7
+FROM alpine:3.2
 
-ADD bin/account /
+COPY bin/account /
+COPY ./static/ /static/
 
 RUN chmod 777 /account
 
+#ENTRYPOINT [ "/account-service" ]
 ENV PARAMS=""
-
+#
 ENTRYPOINT ["sh","-c","/account $PARAMS"]

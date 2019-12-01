@@ -1,6 +1,7 @@
-FROM centos:7
+FROM alpine:3.2
 
-ADD bin/download /
+COPY bin/download /
+COPY ./static/ /static/
 
 RUN chmod 777 /download
 
