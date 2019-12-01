@@ -1,23 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"github.com/c479096292/spinach-disk/common"
 	"github.com/c479096292/spinach-disk/config"
 	"github.com/c479096292/spinach-disk/mq"
+	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
 	"github.com/c479096292/spinach-disk/service/transfer/process"
+	"github.com/micro/cli"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-plugins/registry/consul"
 	"log"
 	"time"
-	"fmt"
-	"github.com/micro/cli"
-	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
 )
 
 func startRPCService() {
+	reg := consul.NewRegistry(func(op *registry.Options){
+		op.Addrs = []string{
+			"127.0.0.1:8500",
+		}
+	})
 	service := micro.NewService(
-		micro.Name("go.micro.service.transfer"), // 服务名称
-		micro.RegisterTTL(time.Second*10),       // TTL指定从上一次心跳间隔起，超过这个时间服务会被服务发现移除
-		micro.RegisterInterval(time.Second*5),   // 让服务在指定时间内重新注册，保持TTL获取的注册时间有效
+		micro.Name("go.micro.service.transfer"),
+		micro.Registry(reg),
+		micro.RegisterTTL(time.Second*10),
+		micro.RegisterInterval(time.Second*5),
 		micro.Flags(common.CustomFlags...),
 	)
 	service.Init(
