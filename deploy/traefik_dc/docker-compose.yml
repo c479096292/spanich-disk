@@ -1,9 +1,9 @@
-version: '2'
+version: '3'
 
 services:
   proxy:
     image: traefik
-    command: --api --docker --docker.domain=docker.localhost --logLevel=DEBUG
+    command: --api=true --api.insecure=true --providers.docker
     networks:
       - apinetwork
     ports:
@@ -11,7 +11,7 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.toml:/etc/traefik/traefik.toml
+#      - ./traefik.toml:/etc/traefik/traefik.toml
 
 networks:
   apinetwork:

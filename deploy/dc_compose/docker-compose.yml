@@ -1,26 +1,24 @@
-version: '2'
+version: '3'
 
 services:
   apigw:
     image: hub.fileserver.com/filestore/apigw
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     env_file:
       - ./.env
     environment:
       - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
     # 区分traefik能力
     labels:
-      - "traefik.backend=apigw"
-      - "traefik.frontend.rule=Host:apigw.fileserver.com"
-      - "traefik.docker.port=8080"
+      - traefik.backend=apigw
+      - traefik.http.routers.dc_compose_apigw_1.rule=Host(`apigw.fileserver.com`)
+      - traefik.http.services.dc_compose_apigw_1.loadbalancer.server.port=8080
 
   upload:
     image: hub.fileserver.com/filestore/upload
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     volumes:
       - /data/fileserver:/data/fileserver
       - /data/fileserver_part:/data/fileserver_part
@@ -30,14 +28,13 @@ services:
       - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
     labels:
       - "traefik.backend=upload"
-      - "traefik.frontend.rule=Host:upload.fileserver.com"
-      - "traefik.docker.port=28080"
-
+      - "traefik.http.routers.dc_compose_upload_1.rule=Host(`upload.fileserver.com`)"
+      - "traefik.http.services.dc_compose_upload_1.loadbalancer.server.port=28080"
+#
   download:
     image: hub.fileserver.com/filestore/download
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     volumes:
       - /data/fileserver:/data/fileserver
       - /data/fileserver_part:/data/fileserver_part
@@ -47,14 +44,13 @@ services:
       - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
     labels:
       - "traefik.backend=download"
-      - "traefik.frontend.rule=Host:download.fileserver.com"
-      - "traefik.docker.port=38080"
-
+      - "traefik.http.routers.dc_compose_download_1.rule=Host(`download.fileserver.com`)"
+      - "traefik.http.services.dc_compose_download_1.loadbalancer.server.port=38080"
+#
   account:
     image: hub.fileserver.com/filestore/account
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     env_file:
       - ./.env
     environment:
@@ -62,9 +58,8 @@ services:
 
   transfer:
     image: hub.fileserver.com/filestore/transfer
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     volumes:
       - /data/fileserver:/data/fileserver
       - /data/fileserver_part:/data/fileserver_part
@@ -75,16 +70,15 @@ services:
 
   dbproxy:
     image: hub.fileserver.com/filestore/dbproxy
-    network_mode: host
-#    networks:
-#      - web
+    networks:
+      - web
     env_file:
       - ./.env
     environment:
       - PARAMS=${registryAddr} ${redisAddr} ${mysqlAddr} ${mqAddr}
 
-#networks:
-#  web:
-#    external:
-#      name:
+networks:
+  web:
+    external:
+      name: fileserver
 
