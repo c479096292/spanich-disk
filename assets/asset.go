@@ -28,7 +28,7 @@
 package assets
 
 import (
-	"github.com/moxiaomomo/go-bindata-assetfs"
+	"github.com/elazarl/go-bindata-assetfs"
 	"bytes"
 	"compress/gzip"
 	"fmt"
