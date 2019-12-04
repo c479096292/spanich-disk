@@ -11,6 +11,7 @@ import (
 	dlProto "github.com/c479096292/spinach-disk/service/download/proto"
 	dlRpc "github.com/c479096292/spinach-disk/service/download/handler"
 	"github.com/c479096292/spinach-disk/service/download/route"
+	_ "github.com/micro/go-plugins/service/kubernetes"
 	cfg "github.com/c479096292/spinach-disk/service/download/config"
 )
 

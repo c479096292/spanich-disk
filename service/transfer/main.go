@@ -7,6 +7,7 @@ import (
 	"github.com/c479096292/spinach-disk/mq"
 	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
 	"github.com/c479096292/spinach-disk/service/transfer/process"
+	_ "github.com/micro/go-plugins/service/kubernetes"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"

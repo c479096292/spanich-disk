@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/c479096292/spinach-disk/common"
 	"github.com/c479096292/spinach-disk/config"
+	_ "github.com/micro/go-plugins/service/kubernetes"
 	"github.com/c479096292/spinach-disk/mq"
 	dbproxy "github.com/c479096292/spinach-disk/service/dbproxy/client"
 	cfg "github.com/c479096292/spinach-disk/service/upload/config"
