@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/c479096292/spinach-disk/service/dbproxy/client"
 	"log"
 	"net/http"
 	"strconv"
@@ -59,4 +61,26 @@ func FileMetaUpdateHandler(c *gin.Context) {
 		rpcResp.FileData = []byte("[]")
 	}
 	c.Data(http.StatusOK, "application/json", rpcResp.FileData)
+}
+
+func FileDeleteHandler(c *gin.Context)  {
+	username := c.Request.FormValue("username")
+	fileName := c.Request.FormValue("filename")
+
+	res, err := client.RemoveFileFromUser(username, fileName)
+	if err != nil {
+		log.Println(err.Error())
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	userFiles := client.ToTableUserFiles(res.Data)
+	data, err := json.Marshal(userFiles)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Data(http.StatusOK,"application/json",data)
+
+
 }

@@ -173,3 +173,9 @@ func RenameFileName(username, filehash, filename string) (*model.ExecResult, err
 	res, err := execAction("/ufile/RenameFileName", uInfo)
 	return parseBody(res), err
 }
+
+func RemoveFileFromUser(username, filename string) (*model.ExecResult, error) {
+	uInfo, _ := json.Marshal([]interface{}{username,filename})
+	res, err := execAction("/ufile/DeleteUserFile", uInfo)
+	return parseBody(res), err
+}

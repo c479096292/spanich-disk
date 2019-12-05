@@ -63,6 +63,6 @@ func Router() *gin.Engine {
 	// 用户文件修改(重命名)
 	router.POST("/file/update", handler.FileMetaUpdateHandler)
 	// TODO 删除
-
+	router.POST("/file/delete", handler.FileDeleteHandler)
 	return router
 }

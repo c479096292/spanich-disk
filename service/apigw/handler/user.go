@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-plugins/registry/consul"
+	_ "github.com/micro/go-plugins/service/kubernetes"
 	"log"
 	"net/http"
 	"context"
