@@ -29,10 +29,10 @@ spec:
       containers:
         - name: svc-apigw
           command: [
-            "/apigw",
+            "/apigwv2",
             "--registry=kubernetes",
           ]
-          image: hub.fileserver.com/filestore/apigw
+          image: hub.fileserver.com/filestore/apigwv2
           imagePullPolicy: IfNotPresent
           ports:
           - containerPort: 8080

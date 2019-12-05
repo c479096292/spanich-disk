@@ -5,8 +5,9 @@ metadata:
   name: traefik-ingress-controller
   namespace: kube-system
 ---
-kind: DaemonSet
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
+#kind: IngressRoute
+kind: Deployment
 metadata:
   name: traefik-ingress-controller
   namespace: kube-system
@@ -25,27 +26,27 @@ spec:
       serviceAccountName: traefik-ingress-controller
       terminationGracePeriodSeconds: 50
       hostNetwork: true
-      volumes:
-      - name: config
-        configMap:
-          name: traefik-conf
+#      volumes:
+#      - name: config
+#        configMap:
+#          name: traefik-conf
       containers:
       - image: traefik
         name: traefik-ingress-lb
         imagePullPolicy: IfNotPresent
-        volumeMounts:
-        - mountPath: "/opt/k8s/conf/"
-          name: "config"
+#        volumeMounts:
+#        - mountPath: "/opt/k8s/conf/"
+#          name: "config"
         ports:
         - name: http
           containerPort: 80
         - name: admin
           containerPort: 8080
         args:
-        - --configFile=./traefik.toml
-        - --web
-        - --kubernetes
-        - --logLevel=DEBUG
+        - --api=true
+        - --api.insecure=true
+        - --providers.kubernetescrd
+#        - --logLevel=DEBUG
 ---
 kind: Service
 apiVersion: v1

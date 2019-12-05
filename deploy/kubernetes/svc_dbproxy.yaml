@@ -33,7 +33,7 @@ spec:
             "--server_address=0.0.0.0:8080",
             "--broker_address=0.0.0.0:10001",
             # mysql地址请根据实际情况进行更改
-            "--dbhost=192.168.2.244:3306",
+            "--dbhost=192.168.15.134:3306",
             "--registry=kubernetes",
           ]
           image: hub.fileserver.com/filestore/dbproxy

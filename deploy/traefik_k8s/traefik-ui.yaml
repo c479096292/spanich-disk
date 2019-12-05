@@ -13,19 +13,27 @@ spec:
     targetPort: 8080
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: traefik.containo.us/v1alpha1
 kind: Ingress
 metadata:
-  name: traefik-web-ui
+  name: traefik-web-route
   namespace: kube-system
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
-  rules:
-  - host: traefik.fileserver.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: traefik-web-ui
-          servicePort: web
+  entryPoints:
+    - web
+  routes:
+    - match: HOST(`traefik.fileserver.com`)
+    - kind: Rule
+    - services:
+        - name: traefik-admin
+        - port: web
+#  rules:
+#  - host: traefik.fileserver.com
+#    http:
+#      paths:
+#      - path: /
+#        backend:
+#          serviceName: traefik-web-ui
+#          servicePort: web
